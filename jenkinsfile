@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+    environment{
+        name='test-build'
+        
+    }
+    parameters{
+        string(name: 'username', defaultValue: 'user', description: "your username")
+        booleanParam(name: 'isAdmin', defaultValue:false, description: "")
+        choice(name: 'city', choices: ['raipur', 'delhi'], description: "")
+    }
+    stages {
+        stage('commands') {
+            environment{
+                var='commands-var'
+            }
+            steps {
+                sh 'date'
+                sh 'pwd'
+                sh'''
+                ls
+                date
+                pwd
+                '''
+                 sh 'echo "${var}"'
+            }
+        }
+        stage('environment variables') {
+            steps {
+                sh 'echo "${BUILD_ID}"'
+                sh 'echo "${name}"'
+                sh 'echo "${var}"'
+            }
+        }
+        stage('parameters') {
+            steps {
+                sh 'echo "${username}"'
+            }
+        }
+        stage('continue ?') {
+            input{
+                message "should we continue"
+                ok "yes we should"
+            }
+            steps {
+                echo 'deploy on production'
+            }
+        }
+    }
+    post { 
+        always { 
+            echo 'I will always say Hello again!'
+        }
+        failure{
+            echo 'failed'
+        }
+        success{
+            echo 'success'
+        }
+    }
+}
